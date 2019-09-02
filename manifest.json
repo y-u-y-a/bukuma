@@ -1,0 +1,13 @@
+{
+  "name": "newTabPage",
+  "manifest_version": 2,
+  "description": "New tab page.",
+  "version": "1.0.0",
+  "permissions" : [
+    "management", // chromeアプリの取得("newtab"のみで使用可能)
+    "bookmarks"   // ブックマークの取得
+  ],
+  "chrome_url_overrides" : {
+    "newtab": "index.html"
+  }
+}
