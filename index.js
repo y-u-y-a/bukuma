@@ -32,52 +32,48 @@ chrome.bookmarks.getTree(function(bookmarks){
 
 
 
-
-  // フォルダの取得(ブックマークバー) ===============================================
+  var TreeName = "folder";
+  // フォルダの繰り返し(ブックマークバー, その他のブックマーク) ===============================================
   for(var i in parent.children){
-
     var parentName = "●" + parent.children[i].title;
 
-    // ①フォルダの場合(開封)
+    // ①フォルダの作成(ul要素作成)
     if(parent.children[i].url == undefined){
-      ulTag(parentName);
+      ulTag(TreeName, parentName);
 
-      // フォルダの取得(２つ目="公式、API"とか) =====================================
+      // フォルダの繰り返し(２つ目="公式、API、就職.....") =====================================
+      // createBranch(parent.children[i]);
       for(var j in parent.children[i].children){
-
-        var childName = parent.children[i].children[j].title;
+        var childName = "●" + parent.children[i].children[j].title;
         var url       = parent.children[i].children[j].url;
 
-        // ②フォルダの場合(開封)
+        // ②フォルダの作成(ul要素作成)
         if(url == undefined){
-          var childName = "●" + childName;
-          ulTag(childName);
+          ulTag(parentName, childName);
 
-          // フォルダの取得(３つ目="JavaScript"<フロントとか)========================
-          for(var k in parent.children[i].children[j].children){
-
-            var oldChildName = parent.children[i].children[j].children[k].title;
-            var url          = parent.children[i].children[j].children[k].url;
-
-            // ③フォルダの場合(開封)
-            if(url == undefined){
-              var oldChildName = "●" + oldChildName;
-              ulTag(oldChildName);
-            }
-            // ③ブックマークの場合
-            if(url != undefined){
-              createBookmarks(childName, oldChildName, url);
-            }
-          }
+          // フォルダの取得(３つ目="JavaScript"<フロント)========================
+          createBranch(parent.children[i].children[j]);
+          // for(var k in parent.children[i].children[j].children){
+          //   var oldChildName = "●" + parent.children[i].children[j].children[k].title;
+          //   var url          = parent.children[i].children[j].children[k].url;
+          //   // ③フォルダの場合(ul要素作成)
+          //   if(url == undefined){
+          //     ulTag(childName, oldChildName);
+          //   }
+          //   // ③ブックマークの作成
+          //   else{
+          //     createBookmarks(childName, oldChildName, url);
+          //   }
+          // }
         }
-        // ②ブックマークの場合
-        if(url != undefined){
+        // ②ブックマークの作成
+        else{
           createBookmarks(parentName, childName, url);
         }
       }
     }
-    // ①ブックマークの場合
-    if(parent.children[i].url != undefined){
+    // ①ブックマークの作成
+    else{
     }
   }
 
@@ -88,24 +84,28 @@ chrome.bookmarks.getTree(function(bookmarks){
   // ここから関数
   //////////////////////////////////////////////////////////////////////////////
 
-  // function getAllBookMarks(child){
-  //   for(var k in child.children){
+  // フォルダ(配列)を使って子要素の表示
+  function createBranch(dirKey){
+    // フォルダの名前の取得
+    var parentName = "●" + dirKey.title;
+    // フォルダの繰り返し
+    for(var i in dirKey.children){
+      var childName = "●" + dirKey.children[i].title;
+      var url       = dirKey.children[i].url;
+      // フォルダの場合(ul要素の作成)
+      if(url == undefined){
+        ulTag(parentName, childName);
+        // フォルダの中身を展開したい(引数のchildrenのキーを使って関数の繰り返し)
+        createBranch(dirKey.children[i]); // 再帰関数？
+      }
+      // ブックマークの作成
+      else{
+        createBookmarks(parentName, childName, url);
+      }
+    }
+  }
 
-  //     var oldChildName = child.children[k].title;
-  //     var url          = child.children[k].url;
-
-  //     // ③フォルダの場合(開封)
-  //     if(url == undefined){
-  //       var oldChildName = "●" + oldChildName;
-  //       ulTag(oldChildName);
-  //     }
-  //     // ③ブックマークの場合
-  //     if(url != undefined){
-  //       createBookmarks(childName, oldChildName, url);
-  //     }
-  //   }
-  // }
-
+  // ブックマークの作成
   function createBookmarks(parentName, childName, url){
     var domain  = url.match(/^https?:\/{2,}(.*?)(?:\/|\?|#|$)/);
     var fabicon = "https://www.google.com/s2/favicons?domain=" + domain;
@@ -115,31 +115,11 @@ chrome.bookmarks.getTree(function(bookmarks){
     aTag(childName, url);
   }
 
-  // // 子要素urlの取得・表示(parentは配列のキー)
-  // function createBookmarks(parent){
-  //   for(var j in parent){
-  //     var bookName = parent[j].title;
-  //     var url       = parent[j].url;
-  //     // ブックマークの場合
-  //     if(url != undefined){
-  //     // var domain    = url.match(/^https?:\/{2,}(.*?)(?:\/|\?|#|$)/)[1];
-  //     // var fabicon   = "https://www.google.com/s2/favicons?domain=" + domain;
-  //     }
-  //     // フォルダの場合
-  //     else{
-  //     }
-  //     // DOMの生成
-  //     liTag(bookName);
-  //     // imgTag(bookName, fabicon);
-  //     aTag(bookName, url);
-  //   }
-  // }
-
-  function ulTag(parentName){
+  function ulTag(parentName, childName){
     var ul = document.createElement("ul");
-    ul.setAttribute("id", parentName);
-    ul.textContent = parentName;
-    document.getElementById("folder").append(ul);
+    ul.setAttribute("id", childName);
+    ul.textContent = childName;
+    document.getElementById(parentName).append(ul);
   }
 
   function liTag(parentName, childName){
