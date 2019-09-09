@@ -1,7 +1,7 @@
 {
-  "name": "newTabPage",
+  "name": "bukuma",
   "manifest_version": 2,
-  "description": "New tab page.",
+  "description": "You can show bookmarklist .",
   "version": "1.0.0",
   "permissions" : [
     "management", // chromeアプリの取得("newtab"のみで使用可能)

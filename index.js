@@ -111,7 +111,7 @@ chrome.bookmarks.getTree(function(bookmarks){
   function createBtn(parentName){
     // spanタグの生成
     var btn = spanTag(parentName, "ー" + parentName);
-    btn.setAttribute("class", "btn");
+    btn.setAttribute("class", "btn dirName");
     // 子要素取得→liタグのみ抽出
     var targetChildren = document.getElementById(parentName).getElementsByTagName("li");
     // イベントの記述

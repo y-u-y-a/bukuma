@@ -95,7 +95,7 @@ input, select {
 /*ここから /////////////////////////////////////////////////////////////////// */
 body{
   width:400px;
-  background-color:#F5F6CE;
+  background-color:#F2F2F2;
 }
 #folder{
   padding:10px;
@@ -130,11 +130,10 @@ a img, span{
   vertical-align:middle;
 }
 .btn{
-  /*color:silver;*/
   cursor:pointer;
 }
 .dirName{
-  color:black;
+  color:#0A2A12;
 }
 a img{
   margin-right:10px;
