@@ -7,7 +7,14 @@
     "management", // chromeアプリの取得("newtab"のみで使用可能)
     "bookmarks"   // ブックマークの取得
   ],
-  "chrome_url_overrides" : {
-    "newtab": "index.html"
-  }
+  // アイコンで拡張機能を動かす
+  "browser_action" : {
+    "default_title": "",
+    "default_icon" : "images/book.jpg",
+    "default_popup": "index.html" // アイコンを押した時に表示
+  },
+  "content_security_policy": "script-src 'self' https://ajax.googleapis.com; object-src 'self'"
+  // "chrome_url_overrides" : {
+  //   "newtab": "index.html"
+  // }
 }
