@@ -1,9 +1,25 @@
 
+///////////////////////////////////////////////////////////
+// bookmarks[0].children[1] : {
+//   children : [],
+//   title    : "その他のブックマーク"
+// }
+// bookmarks[0].children[0] : {
+//   children : [ブックマークバーの情報が配列で入っている],
+//   title    : "folder"
+// }
+// bookmarks[0].children[0].children[0] : {
+//   children : [],
+//   title    : "リファレンス"
+// }
+///////////////////////////////////////////////////////////
+
 // ブックマークの取得
 chrome.bookmarks.getTree(function(bookmarks){
-
   var parent   = bookmarks[0].children[0];
+  // titleは空なので自分で指定する、id属性と一致させる
   parent.title = "folder";
+  // 実際に要素を作っていく
   createBranch(parent);
 
   // var encode = JSON.stringify(parent, null, 4);
@@ -24,7 +40,7 @@ chrome.bookmarks.getTree(function(bookmarks){
         ulTag(parentName, childName);
         createBtn(childName);
         // フォルダの中身を展開したい(引数のchildrenのキーを使って関数の繰り返し)
-        createBranch(dirKey.children[i]); // 再帰関数？
+        createBranch(dirKey.children[i]); // 再帰関数
       }
       // ブックマークの作成
       else{
