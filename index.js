@@ -1,14 +1,17 @@
 
+  // var encode = JSON.stringify(parent, null, 4)
+  // console.log(encode)
+
 ///////////////////////////////////////////////////////////
-// bookmarks[0].children[1] : {
+// parent[1] : {
 //   children : [],
 //   title    : "その他のブックマーク"
 // }
-// bookmarks[0].children[0] : {
+// parent[0] : {
 //   children : [ブックマークバーの情報が配列で入っている],
 //   title    : "folder"
 // }
-// bookmarks[0].children[0].children[0] : {
+// parent.children[0] : {
 //   children : [],
 //   title    : "リファレンス"
 // }
@@ -16,132 +19,109 @@
 
 // ブックマークの取得
 chrome.bookmarks.getTree(function(bookmarks){
-  var parent   = bookmarks[0].children[0];
+  var parent   = bookmarks[0].children[0]
   // titleは空なので自分で指定する、id属性と一致させる
-  parent.title = "folder";
-  // 実際に要素を作っていく
-  createBranch(parent);
-
-  // var encode = JSON.stringify(parent, null, 4);
-  // console.log(encode);
+  parent.title = "folder"
+  console.log(parent)
+  createBranch(parent)
 
   //////////////////////////////////////////////////////////////////////////////
-  // フォルダの取得(ul作成)〜中身の繰り返し
+  // ツリーの作成(キーを利用する"children"と"title")
   //////////////////////////////////////////////////////////////////////////////
-  function createBranch(dirKey){
-    // フォルダ名の取得
-    var parentName = dirKey.title;
-    // フォルダ内の繰り返し
-    for(var i in dirKey.children){
-      var childName = dirKey.children[i].title;
-      var url       = dirKey.children[i].url;
-      // フォルダの場合(ul要素の作成)
-      if(url == undefined){
-        ulTag(parentName, childName);
-        createBtn(childName);
-        // フォルダの中身を展開したい(引数のchildrenのキーを使って関数の繰り返し)
-        createBranch(dirKey.children[i]); // 再帰関数
+  function createBranch(directoryKey){
+    // ディレクトリ名の取得
+    var dirName = directoryKey.title
+    // "children"の展開
+    directoryKey.children.forEach(function(child){
+      var childName = child.title
+      var url       = child.url
+      // まずはliタグを生成する
+      var li = document.createElement("li")
+      li.setAttribute("class", dirName)
+      document.getElementById(dirName).appendChild(li)
+
+      // ここから子要素の展開 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+      // ディレクトリの場合
+      if(url === undefined){
+        ulTagToAppend(li, childName)
+        dirNameToBtn(dirName)
+        // ディレクトリの中身を展開したい(引数のchildrenのキーを使って関数の繰り返し)
+        // createBranch(child) // 再帰関数
       }
-      // ブックマークの作成
+      // ブックマークの場合
       else{
-        createBookmarks(parentName, childName, url);
+        li.setAttribute("id", childName)
+        createBookmarks(li, childName, url)
       }
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // 要素の作成(全て親要素配下にappendするように記述してある)
-  //////////////////////////////////////////////////////////////////////////////
-  function ulTag(parentName, childName){
-    var ul = document.createElement("ul");
-    ul.setAttribute("id", childName);
-    document.getElementById(parentName).append(ul);
-
-    return ul;
-  }
-
-  function liTag(parentName, childName){
-    var li = document.createElement("li");
-    li.setAttribute("id", childName);
-    li.setAttribute("class", "hidden");
-    // li.setAttribute("class", parentName);
-    document.getElementById(parentName).appendChild(li);
-
-    return li;
-  }
-
-  function aTag(myName, url){
-    var a  = document.createElement("a");
-    a.href = url;
-    a.setAttribute("target", "_blank"); // 新しいタブで開かせる
-    a.setAttribute("id", myName + "-link");
-    document.getElementById(myName).appendChild(a);
-
-    return a;
-  }
-
-  // fabiconの画像の表示
-  function imgTag(myName, fabicon){
-    var img = document.createElement("img");
-    img.src = fabicon;
-    document.getElementById(myName + "-link").appendChild(img);
-
-    return img;
-  }
-
-  // (入れる場所, テキスト文&class名)
-  function spanTag(parentName, childName){
-    var span = document.createElement("span");
-    span.setAttribute("class", childName);
-    span.textContent = childName;
-    document.getElementById(parentName).appendChild(span); // 挿入
-
-    return span;
+    })
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // ブックマークの作成
   //////////////////////////////////////////////////////////////////////////////
-  function createBookmarks(parentName, childName, url){
+
+  function createBookmarks(liTag, bookName, url) {
     // fabicon取得のためドメインを抽出
-    var domain  = url.match(/^https?:\/{2,}(.*?)(?:\/|\?|#|$)/);
+    var domain = url.match(/^https?:\/{2,}(.*?)(?:\/|\?|#|$)/)
     // fabiconがあれば取得(chromeのURLなどはdomainを取得できてない)
-    if(domain != null || domain != undefined){
-      domain = domain[1];
-      var fabicon = "https://www.google.com/s2/favicons?domain=" + domain;
+    if (domain != null || domain != undefined) {
+      domain = domain[1]
+      var fabicon = "https://www.google.com/s2/favicons?domain=" + domain
     }
-    else{
-      var fabicon = "";
+    else {
+      var fabicon = ""
     }
-    // DOMの生成(appendする要素名, 自分の名前)
-    liTag(parentName, childName);
-    aTag(childName, url);
-    imgTag(childName, fabicon);
-    spanTag(childName + "-link", childName);
+    // ブックマークの生成
+    imgTagToAppend(liTag, fabicon)
+    aTagToAppend(liTag, bookName, url)
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // ブックマークの表示
+  // タグを生成してappendする関数
   //////////////////////////////////////////////////////////////////////////////
 
-  function createBtn(parentName){
-    // spanタグの生成
-    var btn = spanTag(parentName, "ー" + parentName);
-    btn.setAttribute("class", "btn dirName");
+  function ulTagToAppend(li, dirName){
+    var ul = document.createElement("ul")
+    ul.textContent = dirName
+    ul.setAttribute("id", dirName)
+    li.append(ul)
+  }
+
+  function aTagToAppend(li, bookName, url){
+    var a  = document.createElement("a")
+    a.href = url
+    a.textContent = bookName
+    a.setAttribute("target", "_blank") // 新しいタブで開かせる
+    li.appendChild(a)
+  }
+
+  // fabiconの画像の表示
+  function imgTagToAppend(liTag, fabicon){
+    var img = document.createElement("img")
+    img.src = fabicon
+    liTag.appendChild(img)
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // ディレクトリ名をボタン化する
+  //////////////////////////////////////////////////////////////////////////////
+  function dirNameToBtn(dirName){
+    var dir = document.getElementById(dirName)
+    dir.setAttribute("class", "btn")
     // 子要素取得→liタグのみ抽出
-    var targetChildren = document.getElementById(parentName).getElementsByTagName("li");
+    var targetChildren = dir.getElementsByTagName("li")
     // イベントの記述
-    btn.addEventListener("click", function (){
+    dir.addEventListener("click", function (){
       // liの数だけループでclass名を追加していく
       for(var i in targetChildren){
-        console.log(targetChildren[i].className);
         if(targetChildren[i].className == "hidden"){
-          targetChildren[i].className = "visible";
+          targetChildren[i].className = "visible"
         }
         else if(targetChildren[i].className == "visible"){
-          targetChildren[i].className = "hidden";
+          targetChildren[i].className = "hidden"
         }
       }
-    }, false);
+    }, false)
   }
-});
+})
