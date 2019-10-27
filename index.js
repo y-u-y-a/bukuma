@@ -16,13 +16,10 @@
 //   title    : "リファレンス"
 // }
 ///////////////////////////////////////////////////////////
-
-// ブックマークの取得
 chrome.bookmarks.getTree(function(bookmarks){
   var parent   = bookmarks[0].children[0]
   // titleは空なので自分で指定する、id属性と一致させる
   parent.title = "folder"
-  console.log(parent)
   createBranch(parent)
 
   //////////////////////////////////////////////////////////////////////////////
@@ -44,9 +41,9 @@ chrome.bookmarks.getTree(function(bookmarks){
       // ディレクトリの場合
       if(url === undefined){
         ulTagToAppend(li, childName)
-        dirNameToBtn(dirName)
+        // dirNameToBtn(dirName)
         // ディレクトリの中身を展開したい(引数のchildrenのキーを使って関数の繰り返し)
-        // createBranch(child) // 再帰関数
+        createBranch(child) // 再帰関数
       }
       // ブックマークの場合
       else{
@@ -57,10 +54,39 @@ chrome.bookmarks.getTree(function(bookmarks){
   }
 
   //////////////////////////////////////////////////////////////////////////////
+  // ディレクトリ名をボタン化する
+  //////////////////////////////////////////////////////////////////////////////
+  function dirNameToBtn(dirName) {
+    // ディレクトリ名を持つ要素だけを抽出
+    // クリックイベントを付与
+    // クリックされたら子要素を表示する(切り替え)
+    var target = document.getElementsByClassName(dirName)
+    console.log(target)
+    // 直下の子要素を取得→クラス名の転換
+    // targetChildren.forEach(function(child){
+    //   child.onClick() = function(){
+    //     console.log(targetChildren)
+    //   }
+    // })
+    // イベントの記述
+    // dir.addEventListener("click", function (){
+    //   // liの数だけループでclass名を追加していく
+    //   for(var i in targetChildren){
+    //     if(targetChildren[i].className == "hidden"){
+    //       targetChildren[i].className = "visible"
+    //     }
+    //     else if(targetChildren[i].className == "visible"){
+    //       targetChildren[i].className = "hidden"
+    //     }
+    //   }
+    // }, false)
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
   // ブックマークの作成
   //////////////////////////////////////////////////////////////////////////////
 
-  function createBookmarks(liTag, bookName, url) {
+  function createBookmarks(parentTag, bookName, url) {
     // fabicon取得のためドメインを抽出
     var domain = url.match(/^https?:\/{2,}(.*?)(?:\/|\?|#|$)/)
     // fabiconがあれば取得(chromeのURLなどはdomainを取得できてない)
@@ -72,56 +98,33 @@ chrome.bookmarks.getTree(function(bookmarks){
       var fabicon = ""
     }
     // ブックマークの生成
-    imgTagToAppend(liTag, fabicon)
-    aTagToAppend(liTag, bookName, url)
+    imgTagToAppend(parentTag, fabicon)
+    aTagToAppend(parentTag, bookName, url)
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // タグを生成してappendする関数
   //////////////////////////////////////////////////////////////////////////////
 
-  function ulTagToAppend(li, dirName){
+  function ulTagToAppend(parentTag, dirName){
     var ul = document.createElement("ul")
     ul.textContent = dirName
     ul.setAttribute("id", dirName)
-    li.append(ul)
+    parentTag.append(ul)
   }
 
-  function aTagToAppend(li, bookName, url){
+  function aTagToAppend(parentTag, bookName, url){
     var a  = document.createElement("a")
     a.href = url
     a.textContent = bookName
     a.setAttribute("target", "_blank") // 新しいタブで開かせる
-    li.appendChild(a)
+    parentTag.appendChild(a)
   }
 
   // fabiconの画像の表示
-  function imgTagToAppend(liTag, fabicon){
+  function imgTagToAppend(parentTag, fabicon){
     var img = document.createElement("img")
     img.src = fabicon
-    liTag.appendChild(img)
-  }
-
-
-  //////////////////////////////////////////////////////////////////////////////
-  // ディレクトリ名をボタン化する
-  //////////////////////////////////////////////////////////////////////////////
-  function dirNameToBtn(dirName){
-    var dir = document.getElementById(dirName)
-    dir.setAttribute("class", "btn")
-    // 子要素取得→liタグのみ抽出
-    var targetChildren = dir.getElementsByTagName("li")
-    // イベントの記述
-    dir.addEventListener("click", function (){
-      // liの数だけループでclass名を追加していく
-      for(var i in targetChildren){
-        if(targetChildren[i].className == "hidden"){
-          targetChildren[i].className = "visible"
-        }
-        else if(targetChildren[i].className == "visible"){
-          targetChildren[i].className = "hidden"
-        }
-      }
-    }, false)
+    parentTag.appendChild(img)
   }
 })
