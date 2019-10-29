@@ -1,8 +1,4 @@
-
-  // var encode = JSON.stringify(parent, null, 4)
-  // console.log(encode)
-
-///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // parent[1] : {
 //   children : [],
 //   title    : "その他のブックマーク"
@@ -15,7 +11,7 @@
 //   children : [],
 //   title    : "リファレンス"
 // }
-///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 chrome.bookmarks.getTree(function(bookmarks){
@@ -61,29 +57,6 @@ chrome.bookmarks.getTree(function(bookmarks){
   // ディレクトリ名をボタン化するイベント処理
   //////////////////////////////////////////////////////////////////////////////
   function dirNameToBtn(dirName) {
-    // ディレクトリ名を持つ要素だけを抽出
-    // クリックイベントを付与
-    // クリックされたら子要素を表示する(切り替え)
-    var target = document.getElementsByClassName(dirName)
-    console.log(target)
-    // 直下の子要素を取得→クラス名の転換
-    // targetChildren.forEach(function(child){
-    //   child.onClick() = function(){
-    //     console.log(targetChildren)
-    //   }
-    // })
-    // イベントの記述
-    // dir.addEventListener("click", function (){
-    //   // liの数だけループでclass名を追加していく
-    //   for(var i in targetChildren){
-    //     if(targetChildren[i].className == "hidden"){
-    //       targetChildren[i].className = "visible"
-    //     }
-    //     else if(targetChildren[i].className == "visible"){
-    //       targetChildren[i].className = "hidden"
-    //     }
-    //   }
-    // }, false)
   }
 
   //////////////////////////////////////////////////////////////////////////////
